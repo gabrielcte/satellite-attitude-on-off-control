@@ -6,6 +6,9 @@ import control as ctrl
 import numpy as np
 import matplotlib.pyplot as plt
 
+def Euler(x, x_d, dt):
+    return x + x_d*dt
+
 if __name__ == '__main__':
 
     # PARAMETERS
@@ -30,24 +33,25 @@ if __name__ == '__main__':
 
     # SYSTEM FREQUENCY
     poles = ctrl.poles(G_open)
+
     wn = []
 
     for p in poles:
         wn.append(abs(p))
+
     wn_max = max(wn)
     f_max = wn_max/(2*np.pi)
     f_nyquist = 2*f_max
     fs = 20*f_max
     dt = 1/fs
-
     print('\nPoles:')
     print(poles)
+
     print('\nMaximum Frequency (rad/s):', wn_max)
     print('\nMaximum Frequency (Hz):', f_max)
     print('\nNyquist Frequency (Hz):', f_nyquist)
     print('\nSampling Frequency (Hz):', fs)
     print('\nSimulation Step dt (s):', dt)
-
     # SIMULATION PARAMETERS
     tf = 20                 # (s) Final simulation time
     N = int(tf/dt)          # Number of simulation steps
@@ -80,7 +84,6 @@ if __name__ == '__main__':
 
     # SIMULATION LOOP
     for k in range(N):
-
         t = k*dt
 
         # CONTROL ERROR
@@ -89,8 +92,10 @@ if __name__ == '__main__':
         # ON-OFF CONTROL
         if thet_e > delta:
             up = 1
+
         elif thet_e < -delta:
             up = -1
+
         else:
             up = 0
 
@@ -98,23 +103,17 @@ if __name__ == '__main__':
         u_buffer.append(up)
         u = u_buffer.pop(0)
 
-        # ACTUATOR
+        # DYNAMICS
         f_d = (FM*u - f)/TC
-        f = f + f_d*dt
-
-        # SATELLITE DYNAMICS
         thet_dd = (f - FD)/I
-        thet_d = thet_d + thet_dd*dt
-        thet = thet + thet_d*dt
+        thet_s_dd = (omega**2*(thet - thet_s) - 2*zeta*omega*thet_s_d)
 
-        # ANGLE SENSOR
-        thet_s_dd = (
-            omega**2*(thet - thet_s)
-            - 2*zeta*omega*thet_s_d
-        )
-
-        thet_s_d = thet_s_d + thet_s_dd*dt
-        thet_s = thet_s + thet_s_d*dt
+        # INTEGRATION
+        f = Euler(f, f_d, dt)
+        thet_d = Euler(thet_d, thet_dd, dt)
+        thet = Euler(thet, thet_d, dt)
+        thet_s_d = Euler(thet_s_d, thet_s_dd, dt)
+        thet_s = Euler(thet_s, thet_s_d, dt)
 
         # SAVE DATA
         time_hist.append(t)
@@ -155,5 +154,4 @@ if __name__ == '__main__':
     plt.ylabel('Torque (N.m)')
     plt.xlabel('Time (s)')
     plt.grid()
-
     plt.show()
