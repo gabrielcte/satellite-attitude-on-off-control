@@ -1,5 +1,61 @@
-@startuml name
-:Hello world;
-:This is defined on
-several **lines**;
+@startuml dynamic_simulation
+
+start
+
+partition LOAD {
+
+    :Load parameters;
+    :Define transfer functions;
+    :Find poles;
+    :Find Nyquist frequency;
+    :Define simulation frequency;
+    :Initialize variables;
+    :Initialize delay buffer;
+    :Initialize storage vectors;
+
+}
+
+partition LOOP {
+
+    repeat
+
+        partition CONTROL {
+
+            :Compute control error;
+
+            if (thet_e > delta?) then (yes)
+
+                :up = 1;
+
+            elseif (thet_e < -delta?) then (yes)
+
+                :up = -1;
+
+            else (no)
+
+                :up = 0;
+
+            endif
+
+            :Apply delay buffer;
+
+        }
+
+        :Compute actuator dynamics;
+        :Compute satellite dynamics;
+        :Compute sensor dynamics;
+        :Integration;
+
+        partition SAVE {
+            :Store simulation data;
+        }
+
+    repeat while (k < N)
+
+}
+
+:Generate plots;
+
+stop
+
 @enduml
