@@ -44,7 +44,7 @@ if __name__ == '__main__':
     zeta = 0.7              # Sensor damping ratio
     KR = 0.5                # (s) Rate feedback constant
     FM = 25                 # (N.m) Actuator torque
-    FD = 12.1875            # (N.m) Disturbance torque
+    FD = -12.1875           # (N.m) Disturbance torque
 
     # TRANSFER FUNCTIONS
     s = ctrl.TransferFunction.s
@@ -56,13 +56,15 @@ if __name__ == '__main__':
     # SYSTEM FREQUENCY
     poles = ctrl.poles(G_open)
     wn = []
+    ctrl.pzmap(G_open, grid=True)
+
     for p in poles:
         wn.append(abs(p))
 
     wn_max = max(wn)
     f_max = wn_max/(2*np.pi)
     f_nyquist = 2*f_max
-    fs = 20*f_max
+    fs = 10*f_nyquist
     dt = 1/fs
 
     print('\nPoles:')

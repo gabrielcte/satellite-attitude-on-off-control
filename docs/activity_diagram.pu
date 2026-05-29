@@ -2,16 +2,23 @@
 
 start
 
-partition LOAD {
+partition INITIALIZE {
 
-    :Load parameters;
-    :Define transfer functions;
-    :Find poles;
-    :Find Nyquist frequency;
-    :Define simulation frequency;
-    :Initialize variables;
-    :Initialize delay buffer;
-    :Initialize storage vectors;
+    :Load parameters; <<load>>
+
+    :Define transfer functions; <<procedure>>
+
+    :Find poles; <<task>>
+
+    :Find Nyquist frequency; <<task>>
+
+    :Define simulation frequency; <<task>>
+
+    :Initialize variables; <<load>>
+
+    :Initialize delay buffer; <<load>>
+
+    :Initialize storage vectors; <<load>>
 
 }
 
@@ -21,40 +28,43 @@ partition LOOP {
 
         partition CONTROL {
 
-            :Compute control error;
+            :Compute control error; <<task>>
 
             if (thet_e > delta?) then (yes)
 
-                :up = 1;
+                :up = 1; <<task>>
 
             elseif (thet_e < -delta?) then (yes)
 
-                :up = -1;
+                :up = -1; <<task>>
 
             else (no)
 
-                :up = 0;
+                :up = 0; <<task>>
 
             endif
 
-            :Apply delay buffer;
+            :Apply delay buffer; <<procedure>>
 
         }
 
-        :Compute actuator dynamics;
-        :Compute satellite dynamics;
-        :Compute sensor dynamics;
-        :Integration;
+        :Compute actuator dynamics; <<continuous>>
 
-        partition SAVE {
-            :Store simulation data;
-        }
+        :Compute satellite dynamics; <<continuous>>
+
+        :Compute sensor dynamics; <<continuous>>
+
+        :Integration; <<procedure>>
+
+
+        :Store simulation data; <<save>>
+
 
     repeat while (k < N)
 
 }
 
-:Generate plots;
+:Generate plots; <<output>>
 
 stop
 
