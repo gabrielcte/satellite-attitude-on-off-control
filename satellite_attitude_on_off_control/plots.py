@@ -217,20 +217,18 @@ def plot_phase_flow_satellite(
     peaks_valid = peaks[peaks != idx_max]
     valleys_valid = valleys[valleys != idx_min]
 
-    # Intervalo horizontal para prolongar as retas
-    theta_min_plot = np.min(theta_hist)
-    theta_max_plot = np.max(theta_hist)
+    # Intervalo horizontal entre os extremos globais
+    theta_min_plot = min(theta_hist[idx_max], theta_hist[idx_min])
+    theta_max_plot = max(theta_hist[idx_max], theta_hist[idx_min])
 
     theta_range = theta_max_plot - theta_min_plot
 
     if np.isclose(theta_range, 0):
         theta_line = None
     else:
-        margin = 0.02 * theta_range
-
         theta_line = np.linspace(
-            theta_min_plot - margin,
-            theta_max_plot + margin,
+            theta_min_plot,
+            theta_max_plot,
             500,
         )
 
